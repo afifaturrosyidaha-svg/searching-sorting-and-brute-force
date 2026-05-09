@@ -1,85 +1,826 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{9B32D6A0-9E64-4FE8-9F1B-D20D318E0393}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
-    <RootNamespace>TugasKelompokSortingSearching1</RootNamespace>
-    <AssemblyName>TugasKelompokSortingSearching1</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <Deterministic>true</Deterministic>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="System">
-      <HintPath>..\..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.2\System.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Deployment" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Form1.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Form1.Designer.cs">
-      <DependentUpon>Form1.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Form1.resx">
-      <DependentUpon>Form1.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-</Project>
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Windows.Forms;
+
+namespace TugasKelompokSortingSearching
+{
+    public partial class Form1 : Form
+    {
+
+        string[] namaAwal = {
+            "Andi", "Budi", "Citra", "Deni", "Eka",
+            "Fajar", "Gita", "Hana", "Ilham", "Joko",
+            "Kiki", "Lina", "Miko", "Nadia", "Oscar",
+            "Putri", "Qori", "Raka", "Sari", "Tono",
+            "Umar", "Vina", "Widi", "Xena", "Yoga"
+        };
+
+        int[] nilaiAwal = {
+            78, 55, 90, 42, 67,
+            88, 33, 75, 91, 60,
+            48, 82, 55, 70, 39,
+            85, 63, 77, 91, 50,
+            68, 44, 80, 57, 73
+        };
+
+        
+        string[] nama;
+        int[] nilai;
+
+        
+        List<int[]> stepsNilai = new List<int[]>();
+        List<string[]> stepsNama = new List<string[]>();
+        List<string> stepKeterangan = new List<string>();
+        List<int[]> stepKuning = new List<int[]>();
+        List<int[]> stepMerah = new List<int[]>();
+        List<int[]> stepHijau = new List<int[]>();
+        int currentStep = 0;
+
+        
+        System.Windows.Forms.Timer timerAutoPlay = new System.Windows.Forms.Timer();
+
+        
+        public Form1()
+        {
+            InitializeComponent();
+
+            dgvData.Columns.Clear();
+            dgvData.Columns.Add("No", "No");
+            dgvData.Columns.Add("Nama", "Nama");
+            dgvData.Columns.Add("Nilai", "Nilai");
+            dgvData.Columns[0].Width = 40;
+            dgvData.Columns[1].Width = 100;
+            dgvData.Columns[2].Width = 60;
+
+            dgvPerbandingan.Columns.Clear();
+            dgvPerbandingan.Columns.Add("Algoritma", "Algoritma");
+            dgvPerbandingan.Columns.Add("Perbandingan", "Perbandingan");
+            dgvPerbandingan.Columns.Add("Pertukaran", "Pertukaran");
+            dgvPerbandingan.Columns[0].Width = 120;
+            dgvPerbandingan.Columns[1].Width = 100;
+            dgvPerbandingan.Columns[2].Width = 100;
+
+            SetupTimer();
+            ResetData();
+        }
+
+        void SetupTimer()
+        {
+            timerAutoPlay.Tick += (s, e) =>
+            {
+                if (currentStep < stepsNilai.Count - 1)
+                {
+                    currentStep++;
+                    TampilkanDataGrid(currentStep);
+                }
+                else
+                {
+                    timerAutoPlay.Stop();
+                    btnAutoPlay.Text = "Auto Play";
+                }
+            };
+        }
+
+        void SimpanLangkah(int[] nilaiSaatIni, string[] namaSaatIni,
+                           int[] kuning, int[] merah, int[] hijau, string keterangan)
+        {
+            stepsNilai.Add((int[])nilaiSaatIni.Clone());
+            stepsNama.Add((string[])namaSaatIni.Clone());
+            stepKuning.Add(kuning);
+            stepMerah.Add(merah);
+            stepHijau.Add(hijau);
+            stepKeterangan.Add(keterangan);
+        }
+
+        void TampilkanDataGrid(int langkah)
+        {
+            dgvData.Rows.Clear();
+
+            int[] nilaiStep = stepsNilai[langkah];
+            string[] namaStep = stepsNama[langkah];
+            int[] kuning = stepKuning[langkah];
+            int[] merah = stepMerah[langkah];
+            int[] hijau = stepHijau[langkah];
+
+            for (int i = 0; i < namaStep.Length; i++)
+            {
+                dgvData.Rows.Add(i + 1, namaStep[i], nilaiStep[i]);
+
+                if (Array.IndexOf(merah, i) >= 0)
+                    dgvData.Rows[i].DefaultCellStyle.BackColor = Color.Salmon;
+                else if (Array.IndexOf(kuning, i) >= 0)
+                    dgvData.Rows[i].DefaultCellStyle.BackColor = Color.Yellow;
+                else if (Array.IndexOf(hijau, i) >= 0)
+                    dgvData.Rows[i].DefaultCellStyle.BackColor = Color.LightGreen;
+                else
+                    dgvData.Rows[i].DefaultCellStyle.BackColor = Color.White;
+            }
+
+            lblLangkah.Text = $"Langkah ke-{langkah + 1} dari {stepsNilai.Count}";
+            lblKeterangan.Text = stepKeterangan[langkah];
+        }
+
+        void ResetData()
+        {
+
+            nama = new string[namaAwal.Length];
+            Array.Copy(namaAwal, nama, namaAwal.Length);
+
+            nilai = new int[nilaiAwal.Length];
+            Array.Copy(nilaiAwal, nilai, nilaiAwal.Length);
+
+            stepsNilai.Clear();
+            stepsNama.Clear();
+            stepKeterangan.Clear();
+            stepKuning.Clear();
+            stepMerah.Clear();
+            stepHijau.Clear();
+
+            currentStep = 0;
+            lblPerbandingan.Text = "Perbandingan: 0";
+            lblPertukaran.Text = "Pertukaran: 0";
+            lblKeterangan.Text = "-";
+            lblLangkah.Text = "Langkah: -";
+
+            dgvData.Rows.Clear();
+            for (int i = 0; i < namaAwal.Length; i++)
+                dgvData.Rows.Add(i + 1, namaAwal[i], nilaiAwal[i]);
+        }
+
+        private void JalankanBubbleSort()
+        {
+            ResetData();
+
+            string[] n = (string[])nama.Clone();
+            int[] v = (int[])nilai.Clone();
+
+            int perbandingan = 0;
+            int pertukaran = 0;
+            int panjang = v.Length;
+            List<int> sudahUrut = new List<int>();
+
+            for (int i = 0; i < panjang - 1; i++)
+            {
+                bool adaTukar = false;
+
+                for (int j = 0; j < panjang - i - 1; j++)
+                {
+                    perbandingan++;
+                    SimpanLangkah(v, n,
+                        kuning: new int[] { j, j + 1 },
+                        merah: new int[] { },
+                        hijau: sudahUrut.ToArray(),
+                        keterangan: $"Langkah {stepsNilai.Count + 1}: Membandingkan {n[j]} ({v[j]}) dan {n[j + 1]} ({v[j + 1]}). Perbandingan ke-{perbandingan}.");
+
+                    if (v[j] > v[j + 1])
+                    {
+                        int tmpNilai = v[j];
+                        v[j] = v[j + 1];
+                        v[j + 1] = tmpNilai;
+
+                        string tmpNama = n[j];
+                        n[j] = n[j + 1];
+                        n[j + 1] = tmpNama;
+
+                        pertukaran++;
+                        adaTukar = true;
+
+                        SimpanLangkah(v, n,
+                            kuning: new int[] { },
+                            merah: new int[] { j, j + 1 },
+                            hijau: sudahUrut.ToArray(),
+                            keterangan: $"Langkah {stepsNilai.Count + 1}: Nilai {v[j + 1]} > {v[j]}, tukar posisi! Pertukaran ke-{pertukaran}.");
+                    }
+                }
+
+                sudahUrut.Insert(0, panjang - i - 1);
+                SimpanLangkah(v, n,
+                    kuning: new int[] { },
+                    merah: new int[] { },
+                    hijau: sudahUrut.ToArray(),
+                    keterangan: $"Iterasi ke-{i + 1} selesai. Elemen index {panjang - i - 1} ({n[panjang - i - 1]}, nilai {v[panjang - i - 1]}) sudah di posisi benar.");
+
+                if (!adaTukar) break;
+            }
+
+            int[] semuaIndex = new int[panjang];
+            for (int i = 0; i < panjang; i++) semuaIndex[i] = i;
+            SimpanLangkah(v, n,
+                kuning: new int[] { },
+                merah: new int[] { },
+                hijau: semuaIndex,
+                keterangan: $"Bubble Sort selesai! Total perbandingan: {perbandingan}, Total pertukaran: {pertukaran}.");
+
+            lblPerbandingan.Text = $"Perbandingan: {perbandingan}";
+            lblPertukaran.Text = $"Pertukaran: {pertukaran}";
+
+            CatatHasilSorting(0, perbandingan, pertukaran);
+            MessageBox.Show($"Total langkah tersimpan: {stepsNilai.Count}");
+
+            currentStep = 0;
+            TampilkanDataGrid(0);
+        }
+
+        private void JalankanSelectionSort()
+        {
+            ResetData();
+
+            string[] n = (string[])nama.Clone();
+            int[] v = (int[])nilai.Clone();
+
+            int perbandingan = 0;
+            int pertukaran = 0;
+            int panjang = v.Length;
+            List<int> sudahUrut = new List<int>();
+
+            for (int i = 0; i < panjang - 1; i++)
+            {
+                int indexMin = i;
+
+                for (int j = i + 1; j < panjang; j++)
+                {
+                    perbandingan++;
+                    SimpanLangkah(v, n,
+                        kuning: new int[] { j, indexMin },
+                        merah: new int[] { },
+                        hijau: sudahUrut.ToArray(),
+                        keterangan: $"Langkah {stepsNilai.Count + 1}: Mencari minimum. Membandingkan {n[j]} ({v[j]}) dengan minimum saat ini {n[indexMin]} ({v[indexMin]}). Perbandingan ke-{perbandingan}.");
+
+                    if (v[j] < v[indexMin])
+                    {
+                        indexMin = j;
+                        SimpanLangkah(v, n,
+                            kuning: new int[] { indexMin },
+                            merah: new int[] { },
+                            hijau: sudahUrut.ToArray(),
+                            keterangan: $"Langkah {stepsNilai.Count + 1}: Minimum baru ditemukan: {n[indexMin]} ({v[indexMin]}) di index {indexMin}.");
+                    }
+                }
+
+                if (indexMin != i)
+                {
+                    int tmpNilai = v[i];
+                    v[i] = v[indexMin];
+                    v[indexMin] = tmpNilai;
+
+                    string tmpNama = n[i];
+                    n[i] = n[indexMin];
+                    n[indexMin] = tmpNama;
+
+                    pertukaran++;
+
+                    SimpanLangkah(v, n,
+                        kuning: new int[] { },
+                        merah: new int[] { i, indexMin },
+                        hijau: sudahUrut.ToArray(),
+                        keterangan: $"Langkah {stepsNilai.Count + 1}: Tukar elemen index {i} ({n[i]}) dengan minimum di index {indexMin} ({n[indexMin]}). Pertukaran ke-{pertukaran}.");
+                }
+
+                sudahUrut.Add(i);
+                SimpanLangkah(v, n,
+                    kuning: new int[] { },
+                    merah: new int[] { },
+                    hijau: sudahUrut.ToArray(),
+                    keterangan: $"Iterasi ke-{i + 1} selesai. {n[i]} (nilai {v[i]}) sudah di posisi benar di index {i}.");
+            }
+
+            int[] semuaIndex = new int[panjang];
+            for (int i = 0; i < panjang; i++) semuaIndex[i] = i;
+            SimpanLangkah(v, n,
+                kuning: new int[] { },
+                merah: new int[] { },
+                hijau: semuaIndex,
+                keterangan: $"Selection Sort selesai! Total perbandingan: {perbandingan}, Total pertukaran: {pertukaran}.");
+
+            lblPerbandingan.Text = $"Perbandingan: {perbandingan}";
+            lblPertukaran.Text = $"Pertukaran: {pertukaran}";
+
+            CatatHasilSorting(1, perbandingan, pertukaran);
+            MessageBox.Show($"Total langkah tersimpan: {stepsNilai.Count}");
+
+            currentStep = 0;
+            TampilkanDataGrid(0);
+        }
+
+        private void JalankanInsertionSort()
+        {
+            ResetData();
+
+            string[] n = (string[])nama.Clone();
+            int[] v = (int[])nilai.Clone();
+
+            int perbandingan = 0;
+            int pertukaran = 0;
+            int panjang = v.Length;
+
+            SimpanLangkah(v, n,
+                kuning: new int[] { },
+                merah: new int[] { },
+                hijau: new int[] { 0 },
+                keterangan: "Langkah awal: Elemen pertama (Andi, 78) dianggap sudah terurut.");
+
+            for (int i = 1; i < panjang; i++)
+            {
+                int kunciNilai = v[i];
+                string kunciNama = n[i];
+                int j = i - 1;
+
+                SimpanLangkah(v, n,
+                    kuning: new int[] { i },
+                    merah: new int[] { },
+                    hijau: new int[] { },
+                    keterangan: $"Langkah {stepsNilai.Count + 1}: Ambil elemen ke-{i + 1}: {kunciNama} (nilai {kunciNilai}). Akan disisipkan ke posisi yang tepat.");
+
+                while (j >= 0 && v[j] > kunciNilai)
+                {
+                    perbandingan++;
+                    v[j + 1] = v[j];
+                    n[j + 1] = n[j];
+                    pertukaran++;
+
+                    SimpanLangkah(v, n,
+                        kuning: new int[] { j },
+                        merah: new int[] { j + 1 },
+                        hijau: new int[] { },
+                        keterangan: $"Langkah {stepsNilai.Count + 1}: {n[j]} ({v[j]}) > {kunciNilai}, geser {n[j + 1]} ke kanan ke index {j + 1}. Perbandingan ke-{perbandingan}, Pergeseran ke-{pertukaran}.");
+                    j--;
+                }
+                if (j >= 0) perbandingan++;
+
+                v[j + 1] = kunciNilai;
+                n[j + 1] = kunciNama;
+
+                int[] sudahUrut = new int[i + 1];
+                for (int k = 0; k <= i; k++) sudahUrut[k] = k;
+
+                SimpanLangkah(v, n,
+                    kuning: new int[] { },
+                    merah: new int[] { },
+                    hijau: sudahUrut,
+                    keterangan: $"Langkah {stepsNilai.Count + 1}: {kunciNama} (nilai {kunciNilai}) disisipkan ke index {j + 1}. Kini {i + 1} elemen pertama sudah terurut.");
+            }
+
+            int[] semuaIndex = new int[panjang];
+            for (int i = 0; i < panjang; i++) semuaIndex[i] = i;
+            SimpanLangkah(v, n,
+                kuning: new int[] { },
+                merah: new int[] { },
+                hijau: semuaIndex,
+                keterangan: $"Insertion Sort selesai! Total perbandingan: {perbandingan}, Total pergeseran: {pertukaran}.");
+
+            lblPerbandingan.Text = $"Perbandingan: {perbandingan}";
+            lblPertukaran.Text = $"Pertukaran/Pergeseran: {pertukaran}";
+
+            CatatHasilSorting(2, perbandingan, pertukaran);
+            MessageBox.Show($"Total langkah tersimpan: {stepsNilai.Count}");
+
+            currentStep = 0;
+            TampilkanDataGrid(0);
+        }
+
+        private void JalankanCountingSort()
+        {
+            ResetData();
+
+            string[] n = (string[])nama.Clone();
+            int[] v = (int[])nilai.Clone();
+            int panjang = v.Length;
+
+            int min = v[0], max = v[0];
+            for (int i = 1; i < panjang; i++)
+            {
+                if (v[i] < min) min = v[i];
+                if (v[i] > max) max = v[i];
+            }
+
+            SimpanLangkah(v, n,
+                kuning: new int[] { },
+                merah: new int[] { },
+                hijau: new int[] { },
+                keterangan: $"Langkah awal Counting Sort: Nilai minimum = {min}, maksimum = {max}. Membuat array counting dengan ukuran {max - min + 1}.");
+
+            int[] counting = new int[max - min + 1];
+
+            for (int i = 0; i < panjang; i++)
+            {
+                counting[v[i] - min]++;
+                SimpanLangkah(v, n,
+                    kuning: new int[] { i },
+                    merah: new int[] { },
+                    hijau: new int[] { },
+                    keterangan: $"Langkah {stepsNilai.Count + 1}: Menghitung kemunculan nilai {v[i]} milik {n[i]}. Nilai {v[i]} kini muncul {counting[v[i] - min]}x di counting array.");
+            }
+
+            SimpanLangkah(v, n,
+                kuning: new int[] { },
+                merah: new int[] { },
+                hijau: new int[] { },
+                keterangan: "Selesai menghitung semua nilai. Sekarang menyusun ulang data berdasarkan counting array.");
+
+            int[] outputNilai = new int[panjang];
+            string[] outputNama = new string[panjang];
+            int posisi = 0;
+
+            for (int val = min; val <= max; val++)
+            {
+                for (int i = 0; i < panjang && counting[val - min] > 0; i++)
+                {
+                    if (v[i] == val)
+                    {
+                        outputNilai[posisi] = val;
+                        outputNama[posisi] = n[i];
+                        posisi++;
+                        counting[val - min]--;
+
+                        SimpanLangkah(outputNilai, outputNama,
+                            kuning: new int[] { },
+                            merah: new int[] { posisi - 1 },
+                            hijau: new int[] { },
+                            keterangan: $"Langkah {stepsNilai.Count + 1}: Menempatkan {n[i]} (nilai {val}) ke index {posisi - 1} pada array output.");
+                    }
+                }
+            }
+
+            for (int i = 0; i < panjang; i++)
+            {
+                v[i] = outputNilai[i];
+                n[i] = outputNama[i];
+            }
+
+            int[] semuaIndex = new int[panjang];
+            for (int i = 0; i < panjang; i++) semuaIndex[i] = i;
+            SimpanLangkah(v, n,
+                kuning: new int[] { },
+                merah: new int[] { },
+                hijau: semuaIndex,
+                keterangan: $"Counting Sort selesai! Data sudah terurut dari nilai terkecil ke terbesar. Counting Sort tidak menggunakan perbandingan antar elemen.");
+
+            lblPerbandingan.Text = "Perbandingan: 0 (Counting Sort tidak membandingkan elemen)";
+            lblPertukaran.Text = "Pertukaran: 0 (Counting Sort langsung menempatkan ke posisi)";
+
+            CatatHasilSorting(3, 0, 0);
+            MessageBox.Show($"Total langkah tersimpan: {stepsNilai.Count}");
+
+            currentStep = 0;
+            TampilkanDataGrid(0);
+        }
+
+        private void JalankanSequentialSearch(int nilaiCari)
+        {
+            ResetData();
+
+            string[] n = (string[])namaAwal.Clone();
+            int[] v = (int[])nilaiAwal.Clone();
+            int panjang = v.Length;
+
+            List<int> hasilDitemukan = new List<int>();
+            int langkah = 0;
+
+            SimpanLangkah(v, n,
+                kuning: new int[] { },
+                merah: new int[] { },
+                hijau: new int[] { },
+                keterangan: $"Sequential Search dimulai. Mencari nilai: {nilaiCari}. Memeriksa satu per satu dari index 0.");
+
+            for (int i = 0; i < panjang; i++)
+            {
+                langkah++;
+                if (v[i] == nilaiCari)
+                {
+                    hasilDitemukan.Add(i);
+                    SimpanLangkah(v, n,
+                        kuning: new int[] { },
+                        merah: new int[] { },
+                        hijau: hasilDitemukan.ToArray(),
+                        keterangan: $"Langkah ke-{langkah}: Memeriksa index {i} — {n[i]} ({v[i]}). DITEMUKAN! Nilai {nilaiCari} ada di index {i}.");
+                }
+                else
+                {
+                    SimpanLangkah(v, n,
+                        kuning: new int[] { i },
+                        merah: new int[] { },
+                        hijau: hasilDitemukan.ToArray(),
+                        keterangan: $"Langkah ke-{langkah}: Memeriksa index {i} — {n[i]} ({v[i]}). Nilai {v[i]} ≠ {nilaiCari}, lanjut ke berikutnya.");
+                }
+            }
+
+            string hasilAkhir = hasilDitemukan.Count > 0
+                ? $"Sequential Search selesai. Nilai {nilaiCari} DITEMUKAN di {hasilDitemukan.Count} tempat: index {string.Join(", ", hasilDitemukan)}. Total langkah: {langkah}."
+                : $"Sequential Search selesai. Nilai {nilaiCari} TIDAK DITEMUKAN. Total langkah: {langkah}.";
+
+            int[] semuaHijau = hasilDitemukan.ToArray();
+            SimpanLangkah(v, n,
+                kuning: new int[] { },
+                merah: new int[] { },
+                hijau: semuaHijau,
+                keterangan: hasilAkhir);
+
+            lblPerbandingan.Text = $"Total Langkah Pencarian: {langkah}";
+            lblPertukaran.Text = hasilDitemukan.Count > 0
+                ? $"Ditemukan di index: {string.Join(", ", hasilDitemukan)}"
+                : "Tidak ditemukan";
+
+            MessageBox.Show($"Total langkah tersimpan: {stepsNilai.Count}");
+
+            currentStep = 0;
+            TampilkanDataGrid(0);
+        }
+
+        private void JalankanBinarySearch(int nilaiCari)
+        {
+            ResetData();
+
+            string[] n = (string[])namaAwal.Clone();
+            int[] v = (int[])nilaiAwal.Clone();
+            int panjang = v.Length;
+
+          
+            for (int i = 0; i < panjang - 1; i++)
+            {
+                for (int j = 0; j < panjang - i - 1; j++)
+                {
+                    if (v[j] > v[j + 1])
+                    {
+                        int tmpV = v[j]; v[j] = v[j + 1]; v[j + 1] = tmpV;
+                        string tmpN = n[j]; n[j] = n[j + 1]; n[j + 1] = tmpN;
+                    }
+                }
+            }
+
+            SimpanLangkah(v, n,
+                kuning: new int[] { },
+                merah: new int[] { },
+                hijau: new int[] { },
+                keterangan: $"Data sudah diurutkan terlebih dahulu (diperlukan Binary Search). Sekarang mencari nilai: {nilaiCari}.");
+
+            int low = 0;
+            int high = panjang - 1;
+            int langkah = 0;
+            int hasilIndex = -1;
+
+            while (low <= high)
+            {
+                int mid = (low + high) / 2;
+                langkah++;
+
+                List<int> rentangAktif = new List<int>();
+                for (int i = low; i <= high; i++) rentangAktif.Add(i);
+
+                SimpanLangkah(v, n,
+                    kuning: new int[] { mid },
+                    merah: new int[] { },
+                    hijau: rentangAktif.ToArray(),
+                    keterangan: $"Langkah ke-{langkah}: Low={low}, High={high}, Mid={mid}. Nilai tengah: {n[mid]} ({v[mid]}). Membandingkan {v[mid]} dengan {nilaiCari}.");
+
+                if (v[mid] == nilaiCari)
+                {
+                    hasilIndex = mid;
+                    SimpanLangkah(v, n,
+                        kuning: new int[] { },
+                        merah: new int[] { },
+                        hijau: new int[] { mid },
+                        keterangan: $"Langkah ke-{langkah}: DITEMUKAN! Nilai {nilaiCari} adalah {n[mid]} di index {mid}. Total langkah: {langkah}.");
+                    break;
+                }
+                else if (v[mid] < nilaiCari)
+                {
+                    SimpanLangkah(v, n,
+                        kuning: new int[] { mid },
+                        merah: new int[] { },
+                        hijau: new int[] { },
+                        keterangan: $"Langkah ke-{langkah}: Nilai tengah {v[mid]} < {nilaiCari}. Cari di sebelah KANAN. Low bergeser dari {low} menjadi {mid + 1}.");
+                    low = mid + 1;
+                }
+                else
+                {
+                    SimpanLangkah(v, n,
+                        kuning: new int[] { mid },
+                        merah: new int[] { },
+                        hijau: new int[] { },
+                        keterangan: $"Langkah ke-{langkah}: Nilai tengah {v[mid]} > {nilaiCari}. Cari di sebelah KIRI. High bergeser dari {high} menjadi {mid - 1}.");
+                    high = mid - 1;
+                }
+            }
+
+            if (hasilIndex == -1)
+            {
+                SimpanLangkah(v, n,
+                    kuning: new int[] { },
+                    merah: new int[] { },
+                    hijau: new int[] { },
+                    keterangan: $"Binary Search selesai. Nilai {nilaiCari} TIDAK DITEMUKAN. Total langkah: {langkah}.");
+            }
+
+            lblPerbandingan.Text = $"Total Langkah Pencarian: {langkah}";
+            lblPertukaran.Text = hasilIndex >= 0
+                ? $"Ditemukan di index: {hasilIndex} (nama: {n[hasilIndex]})"
+                : "Tidak ditemukan";
+
+            MessageBox.Show($"Total langkah tersimpan: {stepsNilai.Count}");
+
+
+            currentStep = 0;
+            TampilkanDataGrid(0);
+        }
+
+        void JalankanBruteForceSearch(int nilaiCari)
+        {
+            ResetData();
+
+            string[] n = (string[])namaAwal.Clone();
+            int[] v = (int[])nilaiAwal.Clone();
+            int panjang = v.Length;
+
+            List<int> hasilDitemukan = new List<int>();
+            int langkah = 0;
+
+            SimpanLangkah(v, n,
+                kuning: new int[] { },
+                merah: new int[] { },
+                hijau: new int[] { },
+                keterangan: $"Brute Force Search dimulai. Mencari nilai: {nilaiCari}. Akan memeriksa SEMUA elemen satu per satu tanpa henti.");
+
+            for (int i = 0; i < panjang; i++)
+            {
+                langkah++;
+
+                if (v[i] == nilaiCari)
+                {
+                    hasilDitemukan.Add(i);
+    
+                    SimpanLangkah(v, n,
+                        kuning: new int[] { },
+                        merah: new int[] { },
+                        hijau: hasilDitemukan.ToArray(),
+                        keterangan: $"Langkah ke-{langkah}: Memeriksa index {i} — {n[i]} ({v[i]}). DITEMUKAN! Nilai {nilaiCari} ada di index {i}. Brute Force tetap lanjut ke elemen berikutnya.");
+                }
+                else
+                {
+                    SimpanLangkah(v, n,
+                        kuning: new int[] { i },
+                        merah: new int[] { },
+                        hijau: hasilDitemukan.ToArray(),
+                        keterangan: $"Langkah ke-{langkah}: Memeriksa index {i} — {n[i]} ({v[i]}). {v[i]} ≠ {nilaiCari}, lanjut ke berikutnya.");
+                }
+            }
+
+            string hasilAkhir = hasilDitemukan.Count > 0
+                ? $"Brute Force Search selesai. Nilai {nilaiCari} DITEMUKAN di {hasilDitemukan.Count} tempat: index {string.Join(", ", hasilDitemukan)}. Total langkah: {langkah}."
+                : $"Brute Force Search selesai. Nilai {nilaiCari} TIDAK DITEMUKAN. Total langkah: {langkah}.";
+
+            SimpanLangkah(v, n,
+                kuning: new int[] { },
+                merah: new int[] { },
+                hijau: hasilDitemukan.ToArray(),
+                keterangan: hasilAkhir);
+
+            lblPerbandingan.Text = $"Total Langkah Pencarian: {langkah}";
+            lblPertukaran.Text = hasilDitemukan.Count > 0
+                ? $"Ditemukan di index: {string.Join(", ", hasilDitemukan)}"
+                : "Tidak ditemukan";
+
+            currentStep = 0;
+            TampilkanDataGrid(0);
+        }
+
+
+        private void btnReset_Click(object sender, EventArgs e)
+        {
+            ResetData();
+        }
+
+        private void btnNextStep_Click(object sender, EventArgs e)
+        {
+            if (currentStep < stepsNilai.Count - 1)
+            {
+                currentStep++;
+                TampilkanDataGrid(currentStep);
+            }
+        }
+
+        private void btnPrevStep_Click(object sender, EventArgs e)
+        {
+            if (currentStep > 0)
+            {
+                currentStep--;
+                TampilkanDataGrid(currentStep);
+            }
+        }
+
+        private void btnAutoPlay_Click(object sender, EventArgs e)
+        {
+            if (timerAutoPlay.Enabled)
+            {
+                timerAutoPlay.Stop();
+                btnAutoPlay.Text = "Auto Play";
+            }
+            else
+            {
+                timerAutoPlay.Interval = 1100 - trackBarKecepatan.Value * 100;
+                timerAutoPlay.Start();
+                btnAutoPlay.Text = "Pause";
+            }
+        }
+
+        private void trackBarKecepatan_Scroll(object sender, EventArgs e)
+        {
+            if (timerAutoPlay.Enabled)
+                timerAutoPlay.Interval = 1100 - trackBarKecepatan.Value * 100;
+        }
+
+        private void btnBubble_Click(object sender, EventArgs e)
+        {
+            JalankanBubbleSort();
+        }
+
+        private void btnSelection_Click(object sender, EventArgs e)
+        {
+            JalankanSelectionSort();
+        }
+
+        private void btnInsertion_Click(object sender, EventArgs e)
+        {
+            JalankanInsertionSort();
+        }
+
+        private void btnCounting_Click(object sender, EventArgs e)
+        {
+            JalankanCountingSort();
+        }
+
+        private void btnSequential_Click(object sender, EventArgs e)
+        {
+            if (int.TryParse(txtCari.Text, out int nilai))
+                JalankanSequentialSearch(nilai);
+            else
+                MessageBox.Show("Masukkan angka yang valid untuk dicari!", "Error");
+        }
+
+        private void btnBinary_Click(object sender, EventArgs e)
+        {
+            if (int.TryParse(txtCari.Text, out int nilai))
+                JalankanBinarySearch(nilai);
+            else
+                MessageBox.Show("Masukkan angka yang valid untuk dicari!", "Error");
+        }
+
+        private void btnBruteForce_Click(object sender, EventArgs e)
+        {
+            if (int.TryParse(txtCari.Text, out int nilaiCari))
+            {
+                JalankanBruteForceSearch(nilaiCari);
+            }
+            else
+            {
+                MessageBox.Show("Masukkan nilai angka yang valid!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+
+        private int[] hasilPerbandingan = new int[4];
+        private int[] hasilPertukaran = new int[4];
+        
+        private void btnTabelPerbandingan_Click(object sender, EventArgs e)
+        {
+            dgvPerbandingan.Rows.Clear();
+            string[] namaAlgoritma = { "Bubble Sort", "Selection Sort", "Insertion Sort", "Counting Sort" };
+
+            for (int i = 0; i < 4; i++)
+            {
+                dgvPerbandingan.Rows.Add(namaAlgoritma[i], hasilPerbandingan[i], hasilPertukaran[i]);
+            }
+
+            
+            int minPerbandingan = int.MaxValue;
+            int minPertukaran = int.MaxValue;
+            int idxMinPerb = 0, idxMinTukar = 0;
+
+            for (int i = 0; i < 4; i++)
+            {
+                if (hasilPerbandingan[i] > 0 && hasilPerbandingan[i] < minPerbandingan)
+                {
+                    minPerbandingan = hasilPerbandingan[i];
+                    idxMinPerb = i;
+                }
+                if (hasilPertukaran[i] < minPertukaran)
+                {
+                    minPertukaran = hasilPertukaran[i];
+                    idxMinTukar = i;
+                }
+            }
+            if (minPerbandingan != int.MaxValue)
+                dgvPerbandingan.Rows[idxMinPerb].Cells[1].Style.BackColor = Color.LightGreen;
+            if (minPertukaran != int.MaxValue)
+                dgvPerbandingan.Rows[idxMinTukar].Cells[2].Style.BackColor = Color.LightGreen;
+        }
+
+
+        private void CatatHasilSorting(int indexAlgoritma, int perbandingan, int pertukaran)
+        {
+            hasilPerbandingan[indexAlgoritma] = perbandingan;
+            hasilPertukaran[indexAlgoritma] = pertukaran;
+        }
+
+    }
+}
